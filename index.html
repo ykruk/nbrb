@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Glo-Workshop</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie-edge">
+        <meta name="description" content="Упражнение 4">
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+        <style>
+            .img_poster{
+
+            }
+            .spinner{
+                margin: 0  auto;
+                width: 100px;
+                height: 100px;
+                border: 10px solid;
+                border-radius: 50%;
+                border-left-color: transparent;
+                border-top-color: #aaa;
+                border-right-color: #555;
+                border-bottom-color: #000;
+                animation: spin 500ms infinite linear;
+            }
+            @keyframes spin{
+                100%{
+                    transform: rotate(360deg)
+                }
+            }
+        </style>
+		<nav>
+            <div class="row">
+				<div class="col-2"></div>
+				<div class="col-10">
+					<a href="index.html" class="navbar-brand">yk-movieSearch</a>
+				</div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="jumbotron">
+                <h3 class="text-center">Поиск фильмов</h3>
+                <form id="search-form">
+                    <input type="text" class="form-control" placeholder="Введите название...">
+                </form>
+            </div>
+        </div>
+        <div>
+            <div id="movies" class="row">
+				<div class="col-2"></div>
+				<div class="col-8 table">
+					<table class="table table-hover">
+						
+					</table>
+				</div>
+                <div class="col-2"></div>
+                
+			</div>
+
+        </div>
+
+    <script src="main1.js"></script>
+    </body>
+</html>
