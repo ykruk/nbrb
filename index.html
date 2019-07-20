@@ -3,10 +3,10 @@
 
     <head>
         <meta charset="utf-8">
-        <title>Glo-Workshop</title>
+        <title>НБРБ API</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie-edge">
-        <meta name="description" content="Упражнение 4">
+        <meta name="description" content="Упражнение 7">
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     </head>
@@ -42,27 +42,62 @@
         </style>
 		<nav>
             <div class="row">
-				<div class="col-2"></div>
-				<div class="col-10">
-					<a href="index.html" class="navbar-brand">yk-movieSearch</a>
+				<div class="col-12">
+					<a href="index.html" class="navbar-brand">yk-rates</a>
 				</div>
             </div>
         </nav>
         <div class="container">
-            <div class="jumbotron">
-                <h3 class="text-center">Поиск фильмов</h3>
-                <form id="search-form">
-                    <input type="text" class="form-control" placeholder="Введите название...">
-                </form>
-            </div>
+            <select class="custom-select col-9" id="select">
+                
+            </select>
+            <button type="button" class="btn btn-info  class="col-3>Узнать курс</button>
         </div>
-        <div class="container">
-            <div id="movies" class="row">
-				
-			</div>
-
-        </div>
+        <canvas id="myChart" style="width:400px; height:400px"></canvas>
 
     <script src="main1.js"></script>
+    <script src="node_modules/chart.js/dist/Chart.js"></script>
+    <script>
+
+        // var ctx = document.getElementById('myChart').getContext('2d');
+       
+        // var myChart = new Chart(ctx, {
+        //     type: 'line',
+        //     data: {
+        //         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+
+        //         datasets: [{
+        //             label: 'Динамика валюты',
+        //             data: [2.4734, 2.4734, 2.4865, 2.4791, 2.4780, 2.4780, 2.4780, 2.4708],
+        //             backgroundColor: [
+        //                 'rgba(0, 0, 0, 0)'
+        //             ],
+        //             borderColor: [
+        //                 'rgba(255, 99, 132, 1)'
+        //             ],
+        //             borderWidth: 1
+        //         }]
+        //     },
+        //     options: {
+        //         scales: {
+        //             // xAxes: [{
+        //             //     type: 'time',
+        //             //     time: {
+        //             //         // min: '2019-01-01',
+        //             //         // max: '2019-08-01',
+        //             //         unit: 'day'
+        //             //     }
+        //             // }],
+        //             yAxes: [{
+        //                 ticks: {
+        //                     beginAtZero: false
+        //                 }
+        //             }]
+        //         }
+        //     }
+        // });
+    </script>
+
     </body>
 </html>
+

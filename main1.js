@@ -1,24 +1,20 @@
-const searchForm = document.querySelector('#search-form');
-const movie = document.querySelector('#movies');
+const button = document.querySelector('button');
+const select = document.querySelector('#select');
+const text = document.querySelector('.container');
+const date = new Date();
+const today = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+
 const urlPoster = 'https://image.tmdb.org/t/p/w500';
 
 
-searchForm.addEventListener('submit', apiSearch);
+button.addEventListener('click', apiSearch);
 
 function apiSearch(event) {
-	event.preventDefault();
+	const currency = select.options[select.selectedIndex].value;
 
-	const searchText = document.querySelector('.form-control').value;
+	// event.preventDefault();
 	
-	if(searchText.trim().length === 0){
-		movie.innerHTML = '<h2 class="col-12 text-center text-danger">Поле поиска не должно быть пустым</h2>'
-		return
-	}
-	
-	const server = 'https://api.themoviedb.org/3/search/multi?api_key=65a8d5d6c7e61f2108bf4ac9f08cb0db&language=ru&query=' + searchText;
-	movie.innerHTML = '<div class="spinner"></div>'
-
-	fetch(server)
+	fetch(`http://www.nbrb.by/API/ExRates/Rates/Dynamics/${currency}?startDate=2019-1-1&endDate=2019-6-27`)
 		.then(function(value){
 			if(value.status !== 200){
 				return Promise.reject(new Error(value.status));
@@ -26,173 +22,148 @@ function apiSearch(event) {
 			return value.json();
 		})
 		.then(function(output){
-			let inner = '';
-
-			if(output.results.length === 0){
-				inner = '<h2 class="col-12 text-center text-info">По вашему запросу ничего не найдено</h2>'
-			}
-
-			output.results.forEach(function (item, i, array){
-				let nameItem = item.name || item.title;
-				let dateItem = item.first_air_date || item.release_date;
-				const poster = item.poster_path ? urlPoster + item.poster_path : './img/noposter.jpg'; 
-				let dataInfo = '';
-				if(item.media_type !== 'person'){
-					dataInfo = `data-id="${item.id}" data-type="${item.media_type}"`;
+			// text.innerHTML += `
+			// <br/><br/><br/>
+			// <table class="table table-hover col-5">
+			// 	<thead class="thead-dark">
+			// 	<tr>
+			// 		<th scope="col">Дата</th>
+			// 		<th scope="col">Курс</th>
+			// 	</tr>
+			// 	</thead>
+			// 	<tbody>
+			// 	</tbody>
+			// </table>`
+			const ratesTable = text.querySelector('tbody');
+			let data = [];
+			let labels = [];
+			output.forEach(function(item, i,array){
+				let date = new Date(`${item.Date}`);
+				let year = date.getFullYear();
+				let month = date.getMonth()+1;
+				let dt = date.getDate();
+				if (dt < 10) {
+					dt = '0' + dt;
 				}
-							
-				inner += `
-				<div class="col-12 col-md-4 item">
-				<img src="${poster}" alt="${nameItem}" class="img_poster" ${dataInfo}>
-				<h5>${nameItem}</h5>
-				</div>`		
+				if (month < 10) {
+					month = '0' + month;
+				}
+				rateDate = dt + '.' + month + '.' + year;
+
+				// ratesTable.innerHTML += `
+				// <tr>
+				// 	<td class="col-2">${rateDate}</td>
+				// 	<td class="col-2">${item.Cur_OfficialRate}</td>
+				// </tr>`;
+				data.push(item.Cur_OfficialRate);
+				labels.push(rateDate);
+
 			})
-			
-			inner += '</tbody>';
 
-			movie.innerHTML = inner;
-				
-			addEventMedia();
+			// console.log(currName)
+			
+			var ctx = document.getElementById('myChart').getContext('2d');
+
+			ctx.width = 600;
+       
+			var myChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: labels,
+
+					datasets: [{
+						label: 'Динамика валюты',
+						data: data,
+						backgroundColor: [
+							'rgba(0, 0, 0, 0)'
+						],
+						borderColor: [
+							'rgba(255, 99, 132, 1)'
+						],
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						// xAxes: [{
+						    // type: 'time',
+						    // time: {
+						    //     // min: '2019-01-01',
+						    //     // max: '2019-08-01',
+						    //     unit: 'day'
+						    // }
+						// }],
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					}
+				}
+			});
+	
 		})
 		.catch(function(reason){
-			movie.innerHTML = '<h2 class="col-12 text-center text-info">Упс, что-то пошло не так!</h2>';
+			text.innerHTML += '<h4 class="col-12 text-center text-info">Выберите валюту!</h4>';
 			console.error(reason || reason.status);
 		})
-		;
+	;
 
-}
-
-function addEventMedia() {
-	const media = movie.querySelectorAll('img[data-id]');
-	media.forEach(function(elem){
-		elem.style.cursor = 'pointer'
-		elem.addEventListener('click', showFullInfo)
-	})
-}
-
-function showFullInfo() {
-	let url = '';
-
-	if(this.dataset.type === 'movie'){
-		url = 'https://api.themoviedb.org/3/movie/' + this.dataset.id + '?api_key=65a8d5d6c7e61f2108bf4ac9f08cb0db&language=ru'
-	} else if(this.dataset.type === 'tv'){
-		url = 'https://api.themoviedb.org/3/tv/' + this.dataset.id + '?api_key=65a8d5d6c7e61f2108bf4ac9f08cb0db&language=ru'
-	} else{
-		movie.innerHTML = '<h2 class="col-12 text-center text-danger">Произошла ошибка, повторите позже</h2>';
-	}
-
-	const typeMedia = this.dataset.type;
-	const idMedia = this.dataset.id;
-
-	fetch(url)
-		.then(function(value){
-			if(value.status !== 200){
-				return Promise.reject(new Error(value.status));
-			}
-			return value.json();
-		})
-		.then(function(output){
-			movie.innerHTML = `
-			<h4 class="col-12 text-center text-info">${output.name || output.title}</h4>
-			<div class="col-4">
-				<img src="${urlPoster + output.poster_path}" alt="${output.name || output.title}" class="img_poster">
-				${(output.homepage) ? `<p class='text-center'><a href="${output.homepage}" target="_blank">Официальная страница </a></p>` : ''}
-				${(output.imdb_id) ? `<p class='text-center'><a href="https://imdb.com/title/${output.imdb_id}" target="_blank">Страница на IMDB.com </a></p>` : ''}
-			</div>
-			<div class="col-8">
-				<p>Рейтинг: ${output.vote_average}</p>
-				<p>Статус: ${output.status}</p>
-				<p>Премьера: ${output.first_air_date || output.release_date}</p>
-				${(output.last_episode_to_air) ? `<p>${output.number_of_seasons} сезон ${output.last_episode_to_air.episode_number} серий вышло</p>` : ''}
-				<p>Описание: ${output.overview}</p>
-
-				<br/>
-				<div class="youtube">Видео</div>
-				
-			</div>
-			`;
-
-			getVideo(typeMedia, idMedia);
-			
-		})
-		.catch(function(reason){
-			movie.innerHTML = '<h2 class="col-12 text-center text-info">Упс, что-то пошло не так!</h2>';
-			console.error(reason || reason.status);
-		})
-		;
-		
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-	fetch('https://api.themoviedb.org/3/trending/all/week?api_key=65a8d5d6c7e61f2108bf4ac9f08cb0db&language=ru')
+
+	var curList = [];
+
+	fetch(`http://www.nbrb.by/API/ExRates/Rates?onDate=2019-1-1&Periodicity=0`)
 		.then(function(value){
 			if(value.status !== 200){
 				return Promise.reject(new Error(value.status));
 			}
+			// console.log(value.json());
+			return value.json();	
+		})
+		.then(function(output){
+			output.forEach(function (item, i,array){
+				curList.push(item.Cur_ID) 
+			})
+		})
+		.catch(function(reason){
+			text.innerHTML += '<h4 class="col-12 text-center text-info">Упс, что-то пошло не так!</h4>'
+			console.error(reason || reason.status);
+		})
+		;
+
+	fetch('http://www.nbrb.by/API/ExRates/Currencies')
+		.then(function(value){
+			if(value.status !== 200){
+				return Promise.reject(new Error(value.status));
+			}
+			console.log(value.json());
 			return value.json();
 		})
 		.then(function(output){
-			let inner = '<h4 class="col-12 text-center text-info">Популярные за неделю</h4>';
-	
-			if(output.results.length === 0){
-				inner = '<h2 class="col-12 text-center text-info">По вашему запросу ничего не найдено</h2>'
-			}
-	
-			output.results.forEach(function (item, i, array){
-				let nameItem = item.name || item.title;
-				let mediaType = item.title ? 'movie' : 'tv';
-				const poster = item.poster_path ? urlPoster + item.poster_path : './img/noposter.jpg'; 
-				let dataInfo = `data-id="${item.id}" data-type="${mediaType}"`;	
+			let inner = '<option selected>Choose...</option>';
+			let currName = {};
+			output.forEach(function (item, i,array){
+				if(curList.includes(item.Cur_ID)){
 					inner += `
-					<div class="col-12 col-md-4 item">
-					<img src="${poster}" alt="${nameItem}" class="img_poster" ${dataInfo}>
-					<h5>${nameItem}</h5>
-					</div>`		
-				})
-				
-			inner += '</tbody>';
-	
-			movie.innerHTML = inner;
-					
-			addEventMedia();
+					<option value="${item.Cur_ID}">${item.Cur_Code} (${item.Cur_Abbreviation}) - ${item.Cur_Name}</option>`
+				}
+				//currName.item.Cur_ID = item.Cur_Name;
+			})
+			select.innerHTML = inner;
+			//return currName;
 		})
 		.catch(function(reason){
-			movie.innerHTML = '<h2 class="col-12 text-center text-info">Упс, что-то пошло не так!</h2>';
+			text.innerHTML += '<h4 class="col-12 text-center text-info">Упс, что-то пошло не так!</h4>'
 			console.error(reason || reason.status);
 		})
 		;
 	
 })
 
-function getVideo(type, id){
-	let youtube = movie.querySelector('div.youtube');
+let a = {};
+a.one = 1;
 
-	fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=65a8d5d6c7e61f2108bf4ac9f08cb0db&language=ru`)
-	.then(function(value){
-		if(value.status !== 200){
-			return Promise.reject(new Error(value.status));
-		}
-		return value.json();
-	})
-	.then(function(output){
-		let videoFrame = '<h5 class="col-12 text-info">Видео:</h5>';
-
-		if(output.results.length === 0){
-			videoFrame = '<p>К сожалению видео отсутствуют</p>' 
-		}
-
-		output.results.forEach(function(item){
-			videoFrame += 
-			`<iframe width="560" height="315" src="https://www.youtube.com/embed/${item.key}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-		})
-
-		youtube.innerHTML = videoFrame;
-	})
-	.catch(function(reason){
-		youtube.innerHTML = '<h2 class="col-12 text-center text-info">Видео отсутствует!</h2>';
-		console.error(reason || reason.status);
-	})
-	;
-
-}
-
+console.log(a);
